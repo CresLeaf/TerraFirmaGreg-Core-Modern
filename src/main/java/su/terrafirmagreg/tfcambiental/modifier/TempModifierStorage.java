@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
+
 public class TempModifierStorage implements Iterable<TempModifier> {
     private final List<TempModifier> list = new ArrayList<>();
 
@@ -48,7 +50,7 @@ public class TempModifierStorage implements Iterable<TempModifier> {
     }
 
     @Override
-    public Iterator<TempModifier> iterator() {
+    public @NotNull Iterator<TempModifier> iterator() {
         return list.iterator();
     }
 }

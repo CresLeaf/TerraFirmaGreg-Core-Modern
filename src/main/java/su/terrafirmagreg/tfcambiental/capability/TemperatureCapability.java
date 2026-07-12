@@ -20,11 +20,14 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 
+import lombok.Getter;
+import lombok.Setter;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import su.terrafirmagreg.tfcambiental.TFCAmbiental;
 import su.terrafirmagreg.tfcambiental.TFCAmbientalConfig;
 import su.terrafirmagreg.tfcambiental.api.BlockTemperatureProvider;
+import su.terrafirmagreg.tfcambiental.api.EffectTemperatureProvider;
 import su.terrafirmagreg.tfcambiental.api.EntityTemperatureProvider;
 import su.terrafirmagreg.tfcambiental.api.EnvironmentalTemperatureProvider;
 import su.terrafirmagreg.tfcambiental.api.EquipmentTemperatureProvider;
@@ -40,14 +43,28 @@ public class TemperatureCapability implements ICapabilitySerializable<CompoundTa
     private int tick = 0;
     private int damageTick = 0;
     private int durabilityTick = 0;
+
+    @Getter
+    @Setter
     private Player player;
 
+    @Getter
+    @Setter
     public float temperature;
+
+    @Getter
     public float wetness;
 
     private float target = 15;
+
+    @Getter
     private float targetWetness = 0;
+
+    @Getter
     private float potency = 0;
+
+    @Getter
+    @Setter
     private int enclosureSize = 0;
 
     public static final float BAD_MULTIPLIER = 0.0005f;
@@ -112,49 +129,23 @@ public class TemperatureCapability implements ICapabilitySerializable<CompoundTa
         this.target = this.modifiers.getTargetTemperature();
         this.targetWetness = this.modifiers.getTargetWetness();
 
+        if (fullyInsulated) {
+            this.target = Mth.clamp(this.target, 5f, 25f);
+        } else {
+            this.target = Math.max(this.target, -273.15f);
+        }
+
+        this.target += EffectTemperatureProvider.evaluateAll(this.player, this.target, this.temperature);
+
         if ((this.target > this.temperature && this.temperature > TFCAmbientalConfig.COMMON.hotThreshold.get().floatValue())
                 || (this.target < this.temperature && this.temperature < TFCAmbientalConfig.COMMON.coolThreshold.get().floatValue())) {
             this.potency /= 8.0f;
         }
-
         this.potency = Math.max(1f, this.potency);
-        this.target = Math.max(this.target, -273.15f);
-
-        if (fullyInsulated) {
-            this.target = Mth.clamp(this.target, 5f, 25f);
-        }
     }
 
     public float getTargetTemperature() {
         return this.target;
-    }
-
-    public float getTargetWetness() {
-        return this.targetWetness;
-    }
-
-    public float getPotency() {
-        return this.potency;
-    }
-
-    public Player getPlayer() {
-        return this.player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public float getTemperature() {
-        return this.temperature;
-    }
-
-    public void setTemperature(float temperature) {
-        this.temperature = temperature;
-    }
-
-    public float getWetness() {
-        return this.wetness;
     }
 
     public void setWetness(float wetness) {
@@ -163,14 +154,6 @@ public class TemperatureCapability implements ICapabilitySerializable<CompoundTa
 
     public boolean isInside() {
         return enclosureSize > 0;
-    }
-
-    public int getEnclosureSize() {
-        return enclosureSize;
-    }
-
-    public void setEnclosureSize(int enclosure) {
-        enclosureSize = enclosure;
     }
 
     @NotNull

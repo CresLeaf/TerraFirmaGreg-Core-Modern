@@ -3,6 +3,8 @@ package su.terrafirmagreg.tfcambiental.item.material;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import net.dries007.tfc.common.items.TFCItems;
@@ -16,6 +18,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import su.terrafirmagreg.tfcambiental.TFCAmbientalConfig;
 import su.terrafirmagreg.tfcambiental.modifier.TempModifier;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ClothesMaterial implements ArmorMaterial, TemperatureAlteringMaterial {
     public static final ClothesMaterial BURLAP = new ClothesMaterial(
             "tfcambiental:burlap_cloth",
@@ -78,23 +81,6 @@ public final class ClothesMaterial implements ArmorMaterial, TemperatureAltering
     private final int enchantmentValue;
     private final float change;
     private final float potency;
-
-    private ClothesMaterial(
-            String name,
-            SoundEvent equipSound,
-            Supplier<Ingredient> repairIngredient,
-            IntSupplier durabilitySupplier,
-            int enchantmentValue,
-            float change,
-            float potency) {
-        this.name = name;
-        this.equipSound = equipSound;
-        this.repairIngredient = repairIngredient;
-        this.durabilitySupplier = durabilitySupplier;
-        this.enchantmentValue = enchantmentValue;
-        this.change = change;
-        this.potency = potency;
-    }
 
     @Override
     public int getDurabilityForType(ArmorItem.Type pType) {
